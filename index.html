@@ -6,24 +6,40 @@
   <title>Roulette Game</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
       background-color: #f0f0f0;
     }
 
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 10px;
+    }
+
     #canvas {
       margin: 10px;
+      max-width: 100%; /* Ensure canvas is not larger than its container */
+    }
+
+    .notice {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
     }
   </style>
 </head>
-<body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0;">
-  <div style="display: flex; flex-direction: column; align-items: center;">
+<body>
+  <div class="game-container">
   <canvas id="canvas" width="500" height="500" onclick="spin()"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <div class="notice">Created by piyo</div>
+         </div>
 
 
   <script>
@@ -173,10 +189,5 @@
 
     drawRouletteWheel();
   </script>
-     </div>
-
-   <div style="margin-left: 10px; font-size: 14px; color: #666;">
-    Created by piyo
-  </div>
 </body>
 </html>
