@@ -20,7 +20,8 @@
     }
   </style>
 </head>
-<body>
+<body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0;">
+  <div style="display: flex; flex-direction: column; align-items: center;">
   <canvas id="canvas" width="500" height="500" onclick="spin()"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -169,12 +170,12 @@
 
     selectedOptionIndex = getSelectedOptionIndex();
 
-    console.log(selectedOptionIndex)
 
     drawRouletteWheel();
   </script>
+     </div>
 
-   <div style="margin-top: 10px; font-size: 14px; color: #666;">
+   <div style="margin-left: 10px; font-size: 14px; color: #666;">
     Created by piyo
   </div>
 </body>
