@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roulette Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    #canvas {
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="500" height="500" onclick="spin()"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+  <script>
+    var options = ["Anies", "Prabowo", "Ganjar"];
+    var startAngle = 0;
+    var arc = Math.PI / (options.length / 2);
+    var spinTimeout = null;
+    var spinAngleStart = 10;
+    var spinTime = 0;
+    var spinTimeTotal = 10000; // Adjust the total spin time here (in milliseconds)
+    var selectedOptionIndex = 0; // Variable to store the selected option index
+    var ctx;
+
+    function saveSelectedOptionIndex(index) {
+      localStorage.setItem('selectedOptionIndex', index);
+    }
+
+    function getSelectedOptionIndex() {
+      return parseInt(localStorage.getItem('selectedOptionIndex')) || 0;
+    }
+
+    function byte2Hex(n) {
+      var nybHexString = "0123456789ABCDEF";
+      return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+    }
+
+    function RGB2Color(r, g, b) {
+      return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+    }
+
+    function getColor(item, maxitem) {
+      if (item == 0) {
+        return "#F7F7F7"
+      } else if (item == 1) {
+        return "#85B8F7"
+      } else {
+        return "red"
+      }
+    }
+
+    function drawRouletteWheel() {
+      var canvas = document.getElementById("canvas");
+      if (canvas.getContext) {
+        var outsideRadius = 200;
+        var textRadius = 160;
+        var insideRadius = 125;
+        var centerTextRadius = 30; // Radius for the center text
+        var arrowHeight = 20; // Height of the arrow
+
+        ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, 500, 500);
+
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+
+        ctx.font = 'bold 15px Helvetica, Arial';
+
+        // Draw the roulette wheel
+        for (var i = 0; i < options.length; i++) {
+          var angle = startAngle + i * arc;
+          ctx.fillStyle = getColor(i, options.length);
+
+          ctx.beginPath();
+          ctx.arc(250, 250, outsideRadius, angle, angle + arc, false);
+          ctx.arc(250, 250, insideRadius, angle + arc, angle, true);
+          ctx.stroke();
+          ctx.fill();
+
+          ctx.save();
+          ctx.shadowOffsetX = -1;
+          ctx.shadowOffsetY = -1;
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = "rgb(220,220,220)";
+          ctx.fillStyle = "black";
+          ctx.font = 'bold 20px Helvetica, Arial';
+          ctx.translate(250 + Math.cos(angle + arc / 2) * textRadius, 
+                        250 + Math.sin(angle + arc / 2) * textRadius);
+          ctx.rotate(angle + arc / 2 + Math.PI / 2);
+          var text = options[i];
+          ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+          ctx.restore();
+        }
+
+        // Draw the center circle to fill the gap
+        ctx.beginPath();
+        ctx.arc(250, 250, centerTextRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = "#ffffff"; // Set the color to match the background
+        ctx.fill();
+        ctx.stroke();
+
+        // Draw the "Spin" text in the center
+        ctx.fillStyle = "black";
+        ctx.font = 'bold 20px Helvetica, Arial';
+        ctx.fillText("Spin", 250 - ctx.measureText("Spin").width / 2, 250 + 8);
+
+        // Draw the arrow above the center circle
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.moveTo(250 - 4, 250 - centerTextRadius - arrowHeight);
+        ctx.lineTo(250 + 4, 250 - centerTextRadius - arrowHeight);
+        ctx.lineTo(250, 250 - centerTextRadius - arrowHeight * 1.5);
+        ctx.fill();
+      }
+    }
+
+    function spin() {
+      spinAngleStart = Math.random() * 10 + 10;
+      spinTime = 0;
+      rotateWheel();
+    }
+
+    function rotateWheel() {
+      spinTime += 30;
+      if (spinTime >= spinTimeTotal) {
+        stopRotateWheel();
+        return;
+      }
+      var spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+      startAngle += (spinAngle * Math.PI / 180);
+      drawRouletteWheel();
+      spinTimeout = setTimeout('rotateWheel()', 30);
+    }
+
+    function stopRotateWheel() {
+      clearTimeout(spinTimeout);
+      var degrees = startAngle * 180 / Math.PI + 90;
+      var arcd = arc * 180 / Math.PI;
+      selectedOptionIndex = Math.floor((360 - degrees % 360) / arcd);
+      saveSelectedOptionIndex(selectedOptionIndex);
+      var text = options[selectedOptionIndex];
+      Swal.fire({
+        title: 'Selamat!',
+        text: 'Pilihan Kamu ' + text,
+        icon: 'success',
+      });
+      drawRouletteWheel();
+    }
+
+    function easeOut(t, b, c, d) {
+      var ts = (t/=d)*t;
+      var tc = ts*t;
+      return b+c*(tc + -3*ts + 3*t);
+    }
+
+    selectedOptionIndex = getSelectedOptionIndex();
+
+    console.log(selectedOptionIndex)
+
+    drawRouletteWheel();
+  </script>
+</body>
+</html>
