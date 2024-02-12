@@ -36,6 +36,8 @@
 </head>
 <body>
   <div class="game-container">
+  <h2>Data:</h2>
+  <pre id="data-display"></pre>
   <canvas id="canvas" width="500" height="500" onclick="spin()"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <div class="notice">Created by piyo</div>
@@ -183,6 +185,19 @@
       var tc = ts*t;
       return b+c*(tc + -3*ts + 3*t);
     }
+
+    function loadData() {
+      fetch('data.json')
+        .then(response => response.json())
+        .then(data => {
+          // Display the data in the "data-display" element
+          document.getElementById('data-display').innerText = JSON.stringify(data, null, 2);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Call the function to load data when the page loads
+    loadData();
 
     selectedOptionIndex = getSelectedOptionIndex();
 
